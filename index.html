@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#08111f">
+  <meta name="description" content="ZIP Recovery Lab v2 — pemulihan arsip ZIP pribadi secara lokal dengan kandidat berbasis petunjuk.">
+  <title>ZIP Recovery Lab v2</title>
+  <style>
+    :root{color-scheme:dark;--bg:#070d18;--panel:#101b2d;--panel2:#0b1525;--line:#263a56;--muted:#91a5c0;--text:#edf4ff;--blue:#78b2ff;--blue2:#3a7fe4;--green:#6bdfaa;--red:#ff8d98;--gold:#f4cf86;--cyan:#76d9e8}
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(ellipse at 80% -10%,#1b3b63 0,transparent 34%),radial-gradient(ellipse at 0% 40%,#12223d 0,transparent 30%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .wrap{width:min(1100px,calc(100% - 30px));margin:0 auto;padding:28px 0 48px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:26px}
+    .brand{display:flex;align-items:center;gap:12px}.mark{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;border:1px solid #3a5c88;background:linear-gradient(145deg,#1b3a62,#0b1729);font-weight:900;color:#c3dcff;letter-spacing:-1px;box-shadow:0 8px 26px #0005}
+    .brand strong{display:block;font-size:14px;letter-spacing:.1em}.brand small{display:block;color:var(--muted);font-size:11px}
+    .local{font-size:11px;color:#b7cbe4;padding:7px 10px;border:1px solid #315078;border-radius:99px;background:#0d1b2e;white-space:nowrap}
+    .hero{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:24px}.hero h1{font-size:clamp(29px,5vw,44px);line-height:1.06;letter-spacing:-1.5px;margin:0 0 11px}.hero p{max-width:720px;margin:0;color:#aebed4;font-size:14px}.version{flex:0 0 auto;padding:8px 12px;border:1px solid #3b5b7e;background:#12243a;border-radius:12px;color:#d4e6ff;font-size:12px;font-weight:800}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;align-items:start}.card{background:linear-gradient(180deg,rgba(17,29,48,.98),rgba(10,20,35,.98));border:1px solid var(--line);border-radius:17px;padding:19px;box-shadow:0 14px 38px #0003}.wide{grid-column:1/-1}.cardhead{display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:4px}.num{color:#80b6ff;font:800 11px ui-monospace,monospace;letter-spacing:.09em}.tag{font-size:10px;color:#a8c3e4;border:1px solid #345174;padding:4px 8px;border-radius:99px}.card h2{font-size:16px;margin:0 0 4px}.sub{font-size:11px;color:var(--muted);margin:0 0 15px}
+    label{display:block;font-size:12px;font-weight:700;color:#d8e6f8;margin:0 0 7px}input[type=file],input[type=text],textarea,select{width:100%;border:1px solid #304966;border-radius:10px;background:#081321;color:var(--text);padding:10px 11px;font:inherit;outline:none}textarea{min-height:100px;resize:vertical;line-height:1.5}input:focus,textarea:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #78b2ff1c}.field{margin-bottom:14px}.hint{font-size:10px;color:var(--muted);margin-top:6px}.filebox{padding:13px;border:1px dashed #48678c;border-radius:12px;background:#0a1728}.filebox input{padding:0;border:0;background:transparent}.filemeta{color:#a9c2e0;font-size:11px;overflow-wrap:anywhere;margin-top:8px}.preview{display:none;max-width:100%;max-height:180px;object-fit:contain;border-radius:10px;border:1px solid #38516d;margin-top:10px;background:#050b13}
+    .status{min-height:40px;padding:10px 12px;border-radius:10px;border:1px solid #2b405c;background:#091525;color:#b1c3da;font-size:11px;overflow-wrap:anywhere}.status.good{border-color:#2f795c;background:#0b211a;color:#a5ebc5}.status.bad{border-color:#7a414b;background:#26131a;color:#ffbdc4}.status.warn{border-color:#7a6235;background:#251d10;color:#f5d99f}
+    .checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0 14px}.check{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid #293d59;border-radius:10px;background:#0a1626;color:#d0ddef;font-size:11px;font-weight:500}.check input{margin:3px 0 0;accent-color:var(--blue)}.check small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+    .row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1;min-width:125px}button{border:0;border-radius:10px;padding:11px 14px;font:800 12px system-ui;cursor:pointer;transition:.15s}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:linear-gradient(135deg,#83bdff,#3b7de0);color:#071426}.secondary{background:#1a2c45;color:#dceaff;border:1px solid #345070}.danger{background:#321a24;color:#ffc3c8;border:1px solid #72404a}.quiet{background:#0e1d30;color:#bdd2ed;border:1px solid #2b4564}.primary:not(:disabled):hover{filter:brightness(1.08);transform:translateY(-1px)}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:13px 0}.stat{padding:10px;border:1px solid #293e5b;border-radius:10px;background:#091525;min-width:0}.stat b{display:block;font-size:18px;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}.stat span{display:block;color:var(--muted);font-size:9px}.progress{height:9px;border:1px solid #293d57;border-radius:99px;background:#06101c;overflow:hidden;margin:12px 0 8px}.bar{height:100%;width:0;background:linear-gradient(90deg,#4388eb,#78d4ea);transition:width .12s}.log{max-height:190px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:11px;border:1px solid #293d57;border-radius:10px;background:#060e19;color:#9bb1cc;font:10px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;margin-top:12px}.result{display:none;margin-top:12px;padding:14px;border:1px solid #348061;border-radius:12px;background:#0b211a}.result .headline{color:#a5ebc5;font-weight:900;font-size:13px;margin-bottom:7px}.passwordline{display:flex;align-items:center;gap:8px}.passwordline code{font-size:17px;color:#f1fff7;overflow-wrap:anywhere;flex:1}.resultmeta{font-size:10px;color:#b6d9c8;margin-top:7px}.filelist{display:grid;gap:7px;margin-top:11px}.entry{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid #2a405b;border-radius:9px;background:#091626;font-size:10px}.entry span:first-child{overflow-wrap:anywhere;min-width:0}.entry .state{white-space:nowrap;color:#9fe0be}.note{border-left:3px solid var(--gold);padding:10px 12px;background:#211b10;color:#e9d7ac;border-radius:0 9px 9px 0;font-size:10px;margin-top:14px}.footer{text-align:center;color:#7588a4;font-size:10px;margin-top:23px}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.hero{align-items:start;flex-direction:column}.wrap{padding-top:20px}.card{padding:15px}.stats{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.local{font-size:9px}}
+    @media(max-width:400px){.checks{grid-template-columns:1fr}.row>*{min-width:100px}.brand strong{font-size:12px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="brand"><div class="mark">ZR</div><div><strong>ZIP RECOVERY LAB</strong><small>Personal archive recovery toolkit</small></div></div>
+      <div class="local">● FILE DIPROSES LOKAL</div>
+    </header>
+
+    <section class="hero">
+      <div><h1>Recover smarter.<br>Verify properly.</h1><p>Versi 2 membawa diagnosis ZIP yang lebih jelas, generator kandidat berbasis petunjuk, pengujian dengan verifikasi isi file, dan log yang lebih informatif. Arsip tetap berada di perangkatmu.</p></div>
+      <div class="version">VERSION 2.0</div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <div class="cardhead"><div class="num">01 / ARCHIVE</div><span class="tag">LOCAL FILE</span></div>
+        <h2>Pilih file ZIP</h2><p class="sub">Pilih arsip yang kamu miliki atau yang memang diberikan untuk latihan.</p>
+        <div class="field filebox"><label for="zipFile">File .zip</label><input id="zipFile" type="file" accept=".zip,application/zip"><div id="zipMeta" class="filemeta">Belum ada file dipilih.</div></div>
+        <div id="zipStatus" class="status">Pilih ZIP untuk membaca struktur arsip.</div>
+        <div class="stats">
+          <div class="stat"><b id="fileCount">—</b><span>File non-folder</span></div>
+          <div class="stat"><b id="encryptedCount">—</b><span>Entri terenkripsi</span></div>
+        </div>
+        <label for="entryMode">Metode verifikasi</label>
+        <select id="entryMode"><option value="all">Semua entri terenkripsi (lebih kuat)</option><option value="first">Satu entri terenkripsi (lebih cepat)</option></select>
+        <div class="hint">Mode semua entri memastikan kandidat yang ditemukan dapat membuka seluruh file terenkripsi dengan password yang sama.</div>
+        <div id="entryList" class="filelist"></div>
+      </section>
+
+      <section class="card">
+        <div class="cardhead"><div class="num">02 / CLUES</div><span class="tag">MANUAL INPUT</span></div>
+        <h2>Petunjuk dari gambar</h2><p class="sub">Masukkan teks yang terlihat pada gambar tugas atau petunjuk yang kamu ingat.</p>
+        <div class="field"><label for="clueImage">Gambar petunjuk (opsional)</label><input id="clueImage" type="file" accept="image/*"><img id="imagePreview" class="preview" alt="Preview gambar petunjuk"><div class="hint">Gambar hanya ditampilkan sebagai referensi. OCR otomatis belum tersedia; tulis teksnya di bawah.</div></div>
+        <div class="field"><label for="words">Kata / nama / kode</label><textarea id="words" placeholder="Contoh:\nBandung\nFadli\nKampus"></textarea><div class="hint">Satu petunjuk per baris. Tanda baca di dalam teks dipertahankan.</div></div>
+        <div class="field"><label for="numbers">Angka / tahun / tanggal</label><textarea id="numbers" style="min-height:74px" placeholder="Contoh:\n26\n2005\n0611"></textarea><div class="hint">Satu angka per baris. Bisa dicoba sebagai awalan, akhiran, atau sisipan.</div></div>
+      </section>
+
+      <section class="card wide">
+        <div class="cardhead"><div class="num">03 / CANDIDATE BUILDER</div><span class="tag">TARGETED PATTERNS</span></div>
+        <h2>Bangun kandidat password</h2><p class="sub">Generator membuat variasi dari petunjuk yang kamu masukkan. Bukan pencarian semua kemungkinan karakter tanpa batas.</p>
+        <div class="checks">
+          <label class="check"><input id="caseBasic" type="checkbox" checked><span>Variasi kapitalisasi<small>lowercase, UPPERCASE, Title Case</small></span></label>
+          <label class="check"><input id="caseAlt" type="checkbox" checked><span>Huruf selang-seling<small>aBcD dan AbCd</small></span></label>
+          <label class="check"><input id="combineWords" type="checkbox" checked><span>Gabungkan dua petunjuk<small>nama+kode, dua kata, urutan terbalik</small></span></label>
+          <label class="check"><input id="addNumbers" type="checkbox" checked><span>Gabungkan angka<small>kata+angka dan angka+kata</small></span></label>
+          <label class="check"><input id="insertNumbers" type="checkbox"><span>Sisipkan angka ke kata<small>angka di posisi berbeda, termasuk awal/akhir</small></span></label>
+          <label class="check"><input id="interleaveNumbers" type="checkbox"><span>Selang-seling huruf + angka<small>contoh: B2a0n2d6ung</small></span></label>
+          <label class="check"><input id="punctuation" type="checkbox"><span>Tanda baca umum<small>akhiran ! _ - . @ #</small></span></label>
+          <label class="check"><input id="reverseWords" type="checkbox"><span>Teks terbalik<small>Bandung → gnudnaB</small></span></label>
+        </div>
+        <div class="field"><label for="manual">Kandidat khusus (opsional)</label><textarea id="manual" style="min-height:70px" placeholder="Tulis kandidat yang paling kamu curigai, satu per baris"></textarea></div>
+        <div class="row"><button id="buildBtn" class="secondary" type="button">Generate candidates</button><button id="exportBtn" class="quiet" type="button" disabled>Export daftar .txt</button><button id="clearBtn" class="quiet" type="button">Reset petunjuk</button></div>
+        <div class="stats"><div class="stat"><b id="candidateCount">0</b><span>Kandidat dibuat</span></div><div class="stat"><b id="tested">0</b><span>Sudah diuji</span></div><div class="stat"><b id="remaining">0</b><span>Belum diuji</span></div><div class="stat"><b id="speed">0/s</b><span>Kecepatan rata-rata</span></div></div>
+        <div class="hint">Batas 10.000 kandidat per sesi. Kandidat disimpan sementara di memori browser dan tidak dikirim ke server.</div>
+      </section>
+
+      <section class="card wide">
+        <div class="cardhead"><div class="num">04 / RECOVERY ENGINE</div><span class="tag">CONTENT VERIFICATION</span></div>
+        <h2>Uji kandidat dan verifikasi</h2><p class="sub">V2 mempertahankan sesi pembacaan ZIP selama pengujian, lalu memeriksa isi file dengan checksum / autentikasi yang tersedia.</p>
+        <div class="row"><button id="startBtn" class="primary" type="button" disabled>Start recovery</button><button id="stopBtn" class="danger" type="button" disabled>Stop</button></div>
+        <div class="progress"><div id="bar" class="bar"></div></div>
+        <div id="runStatus" class="status">Pilih ZIP dan buat daftar kandidat terlebih dahulu.</div>
+        <div class="result" id="successBox"><div class="headline" id="resultHeadline">PASSWORD VERIFIED</div><div class="passwordline"><code id="foundPassword"></code><button id="copyBtn" class="secondary" type="button">Copy</button></div><div id="resultMeta" class="resultmeta"></div><div id="verifiedList" class="filelist"></div></div>
+        <div class="log" id="log">[ready] ZIP Recovery Lab v2 siap.
+[info] Hanya gunakan pada arsip milik sendiri / berizin.</div>
+        <div class="note">Catatan: password yang benar tidak bisa ditebak hanya dari file ZIP tanpa petunjuk yang cukup. Jika semua kandidat gagal, artinya kandidat belum cocok, bukan bukti bahwa ZIP mustahil dibuka. File rusak juga dapat memicu kegagalan verifikasi.</div>
+      </section>
+    </div>
+    <div class="footer">ZIP Recovery Lab v2.0 · Browser-side processing · Powered by @zip.js/zip.js 2.24.0</div>
+  </main>
+
+  <script type="module">
+    import { BlobReader, BlobWriter, ZipReader } from "https://esm.sh/@zip.js/zip.js@2.24.0";
+
+    const $ = id => document.getElementById(id);
+    const MAX_CANDIDATES = 10000;
+    let zipFile = null;
+    let zipReader = null;
+    let allEntries = [];
+    let encryptedEntries = [];
+    let candidates = [];
+    let stopRequested = false;
+    let running = false;
+    let objectUrl = null;
+
+    const formatSize = n => n < 1024 ? `${n} B` : n < 1024*1024 ? `${(n/1024).toFixed(1)} KB` : `${(n/1024/1024).toFixed(2)} MB`;
+    const stamp = () => new Date().toLocaleTimeString("id-ID", {hour12:false});
+    function log(message) { const el=$("log"); el.textContent += `\n[${stamp()}] ${message}`; el.scrollTop=el.scrollHeight; }
+    function status(id,message,kind="") { const el=$(id); el.className=`status ${kind}`.trim(); el.textContent=message; }
+    function updateStart() { $("startBtn").disabled = !zipFile || !encryptedEntries.length || !candidates.length || running; }
+    function resetRunUi() {
+      $("tested").textContent="0"; $("remaining").textContent=candidates.length.toLocaleString("id-ID"); $("speed").textContent="0/s";
+      $("bar").style.width="0%"; $("successBox").style.display="none"; $("exportBtn").disabled=!candidates.length;
+    }
+
+    async function closeArchive() {
+      if (zipReader) { try { await zipReader.close(); } catch {} }
+      zipReader=null; allEntries=[]; encryptedEntries=[];
+      if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl=null; }
+    }
+
+    $("zipFile").addEventListener("change", async e => {
+      await closeArchive();
+      zipFile=e.target.files?.[0] || null;
+      candidates=[]; $("candidateCount").textContent="0"; $("exportBtn").disabled=true; updateStart();
+      $("fileCount").textContent="—"; $("encryptedCount").textContent="—"; $("entryList").replaceChildren();
+      $("zipMeta").textContent=zipFile ? `${zipFile.name} · ${formatSize(zipFile.size)}` : "Belum ada file dipilih.";
+      if (!zipFile) return;
+      status("zipStatus","Membaca struktur arsip…");
+      try {
+        zipReader=new ZipReader(new BlobReader(zipFile));
+        allEntries=await zipReader.getEntries();
+        const files=allEntries.filter(x=>!x.directory);
+        encryptedEntries=files.filter(x=>x.encrypted);
+        $("fileCount").textContent=files.length.toLocaleString("id-ID");
+        $("encryptedCount").textContent=encryptedEntries.length.toLocaleString("id-ID");
+        const list=$("entryList");
+        for (const entry of files.slice(0,40)) {
+          const line=document.createElement("div"); line.className="entry";
+          const name=document.createElement("span"); name.textContent=entry.filename;
+          const flag=document.createElement("span"); flag.className="state"; flag.textContent=entry.encrypted ? (entry.zipCrypto ? "ZIPCRYPTO" : (entry.extraFieldAES ? "WINZIP AES" : "ENCRYPTED")) : "PLAIN";
+          line.append(name,flag); list.append(line);
+        }
+        if (files.length>40) { const more=document.createElement("div"); more.className="hint"; more.textContent=`+ ${files.length-40} file lain tidak ditampilkan.`; list.append(more); }
+        if (!files.length) status("zipStatus","Arsip terbaca, tetapi tidak ada file di dalamnya.","warn");
+        else if (!encryptedEntries.length) status("zipStatus","Tidak ada entri terenkripsi yang terdeteksi. ZIP mungkin memang tidak memakai password.","warn");
+        else status("zipStatus",`${files.length} file terbaca. ${encryptedEntries.length} entri terenkripsi siap diverifikasi.`,"good");
+        log(`ZIP dimuat: ${zipFile.name} | ${files.length} file | ${encryptedEntries.length} terenkripsi`);
+      } catch (err) {
+        await closeArchive();
+        status("zipStatus",`Gagal membaca ZIP: ${errorText(err)}`,"bad");
+        log(`ERROR membaca arsip: ${errorText(err)}`);
+      }
+      updateStart();
+    });
+
+    $("clueImage").addEventListener("change", e => {
+      const file=e.target.files?.[0], img=$("imagePreview");
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      if (!file) { img.style.display="none"; img.removeAttribute("src"); return; }
+      if (!file.type.startsWith("image/")) { status("runStatus","File petunjuk harus berupa gambar.","warn"); return; }
+      objectUrl=URL.createObjectURL(file); img.src=objectUrl; img.style.display="block";
+    });
+
+    function caseForms(value) {
+      const out=new Set([value]);
+      if ($("caseBasic").checked) {
+        out.add(value.toLowerCase()); out.add(value.toUpperCase());
+        out.add(value.toLocaleLowerCase("id-ID").replace(/(^|[\s_-])([a-z])/g,(m,p,c)=>p+c.toUpperCase()));
+      }
+      if ($("caseAlt").checked) {
+        const alt=firstUpper=>{let n=0;return [...value].map(ch=>{if(!/[a-z]/i.test(ch))return ch;const upper=(n++%2===0)===firstUpper;return upper?ch.toUpperCase():ch.toLowerCase();}).join("");};
+        out.add(alt(false)); out.add(alt(true));
+      }
+      return [...out].filter(Boolean);
+    }
+
+    function buildCandidates() {
+      const words=$("words").value.split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean);
+      const nums=$("numbers").value.split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean);
+      const manual=$("manual").value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+      const coreSeeds=new Set(words);
+      if ($("combineWords").checked) {
+        for (let i=0;i<words.length;i++) for (let j=i+1;j<words.length;j++) {
+          for (const sep of ["","_","-"]) { coreSeeds.add(words[i]+sep+words[j]); coreSeeds.add(words[j]+sep+words[i]); }
+        }
+      }
+      const raw=new Set();
+      const push=x=>{ if (x && raw.size<MAX_CANDIDATES) raw.add(x); };
+      manual.forEach(push);
+      coreSeeds.forEach(push);
+      if ($("addNumbers").checked) {
+        for (const base of coreSeeds) for (const n of nums) {
+          for (const sep of ["","_","-"]) { push(base+sep+n); push(n+sep+base); }
+        }
+      }
+      if ($("insertNumbers").checked) {
+        for (const base of coreSeeds) for (const n of nums) {
+          for (let at=0;at<=base.length;at++) push(base.slice(0,at)+n+base.slice(at));
+        }
+      }
+      if ($("interleaveNumbers").checked) {
+        for (const base of coreSeeds) for (const n of nums) {
+          const letters=[...base], digits=[...n], max=Math.max(letters.length,digits.length);
+          let letterFirst="", digitFirst="";
+          for(let i=0;i<max;i++) {
+            if(letters[i]) letterFirst+=letters[i];
+            if(digits[i]) letterFirst+=digits[i];
+            if(digits[i]) digitFirst+=digits[i];
+            if(letters[i]) digitFirst+=letters[i];
+          }
+          push(letterFirst); push(digitFirst);
+        }
+      }
+      const final=new Set();
+      for (const seed of raw) {
+        for (const v of caseForms(seed)) {
+          final.add(v);
+          if ($("reverseWords").checked) final.add([...v].reverse().join(""));
+          if ($("punctuation").checked) for (const mark of ["!","_","-",".","@","#"]) final.add(v+mark);
+          if (final.size>=MAX_CANDIDATES) break;
+        }
+        if (final.size>=MAX_CANDIDATES) break;
+      }
+      candidates=[...final].slice(0,MAX_CANDIDATES);
+      $("candidateCount").textContent=candidates.length.toLocaleString("id-ID");
+      resetRunUi();
+      status("runStatus",candidates.length ? `${candidates.length.toLocaleString("id-ID")} kandidat siap diuji.` : "Belum ada kandidat. Isi minimal satu petunjuk.",candidates.length?"good":"warn");
+      log(`Generator selesai: ${candidates.length} kandidat unik dibuat dari ${words.length} kata, ${nums.length} angka, dan ${manual.length} kandidat manual.`);
+      updateStart();
+    }
+
+    function errorText(err) {
+      if (!err) return "Unknown error";
+      return `${err.code ? err.code+": " : ""}${err.message || String(err)}`;
+    }
+    function errorChain(err) {
+      const parts=[]; let current=err; let depth=0;
+      while(current && depth++<4) { parts.push(`${current.code||""} ${current.name||""} ${current.message||current}`); current=current.cause; }
+      return parts.join(" ").toLowerCase();
+    }
+    function isCandidateMismatch(err) {
+      const s=errorChain(err);
+      return ["err_invalid_password","err_invalid_authentication_code","err_invalid_crc32","err_invalid_compressed_data","err_invalid_uncompressed_size"].some(code=>s.includes(code))
+        || /invalid password|wrong password|authentication code|crc-?32|checksum mismatch/i.test(s);
+    }
+    async function verifyEntry(entry,password) {
+      await entry.getData(new BlobWriter(), { password, checkCrc32:true, checkAuthenticationCode:true });
+    }
+    function selectedEntries() {
+      return $("entryMode").value==="first" ? encryptedEntries.slice(0,1) : encryptedEntries;
+    }
+    function updateProgress(tested,total,startTime) {
+      $("tested").textContent=tested.toLocaleString("id-ID");
+      $("remaining").textContent=(total-tested).toLocaleString("id-ID");
+      const pct=total ? Math.round(tested/total*100) : 0;
+      $("bar").style.width=pct+"%";
+      const elapsed=Math.max((Date.now()-startTime)/1000,.001);
+      $("speed").textContent=(tested/elapsed).toFixed(1)+"/s";
+    }
+
+    $("buildBtn").addEventListener("click",buildCandidates);
+    $("clearBtn").addEventListener("click",()=>{
+      $("words").value=""; $("numbers").value=""; $("manual").value=""; candidates=[];
+      $("candidateCount").textContent="0"; resetRunUi(); status("runStatus","Petunjuk dibersihkan."); log("Input petunjuk direset."); updateStart();
+    });
+    $("exportBtn").addEventListener("click",()=>{
+      if(!candidates.length)return;
+      const blob=new Blob([candidates.join("\n")],{type:"text/plain;charset=utf-8"});
+      const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="zip-recovery-candidates.txt"; a.click(); URL.revokeObjectURL(url);
+      log(`Daftar kandidat diekspor (${candidates.length} baris).`);
+    });
+
+    $("startBtn").addEventListener("click",async()=>{
+      if(running||!zipReader||!encryptedEntries.length||!candidates.length)return;
+      running=true; stopRequested=false; updateStart(); $("stopBtn").disabled=false;
+      $("successBox").style.display="none"; $("log").textContent="[start] Pengujian kandidat dimulai…";
+      const targets=selectedEntries(), total=candidates.length, startTime=Date.now();
+      let tested=0, found=null, fatal=null;
+      status("runStatus",`Menguji ${total.toLocaleString("id-ID")} kandidat terhadap ${targets.length} entri terenkripsi…`);
+      try {
+        for(const candidate of candidates){
+          if(stopRequested)break;
+          let passed=true, verified=0;
+          for(const entry of targets){
+            try { await verifyEntry(entry,candidate); verified++; }
+            catch(err){
+              if(isCandidateMismatch(err)){passed=false;break;}
+              fatal=err; passed=false; break;
+            }
+          }
+          tested++;
+          updateProgress(tested,total,startTime);
+          if(fatal)break;
+          if(passed){found={password:candidate,verified,targets:targets.length};break;}
+          if(tested%3===0){
+            status("runStatus",`Sedang menguji kandidat ${tested.toLocaleString("id-ID")} / ${total.toLocaleString("id-ID")}…`);
+            await new Promise(resolve=>setTimeout(resolve,0));
+          }
+        }
+        if(fatal){
+          status("runStatus",`Pengujian dihentikan karena masalah arsip / format: ${errorText(fatal)}`,"bad");
+          log(`ERROR non-password: ${errorText(fatal)}`);
+        } else if(found){
+          $("foundPassword").textContent=found.password;
+          $("resultHeadline").textContent=$("entryMode").value==="all" ? "PASSWORD VERIFIED · ALL TARGET ENTRIES" : "PASSWORD VERIFIED · SAMPLE ENTRY ONLY";
+          $("resultMeta").textContent=`Terverifikasi ${found.verified} dari ${found.targets} entri yang dipilih. ${$("entryMode").value==="first"?"Mode satu entri tidak menjamin file lain memakai password yang sama.":"Konten berhasil didekripsi dan pemeriksaan integritas dijalankan."}`;
+          $("verifiedList").replaceChildren();
+          for(const entry of targets){const line=document.createElement("div");line.className="entry";const name=document.createElement("span");name.textContent=entry.filename;const state=document.createElement("span");state.className="state";state.textContent="VERIFIED";line.append(name,state);$("verifiedList").append(line);}
+          $("successBox").style.display="block";
+          status("runStatus",`Password cocok. ${found.verified} entri berhasil didekripsi dan diverifikasi.`,"good");
+          log(`PASSWORD VERIFIED setelah ${tested} percobaan. Entitas terverifikasi: ${found.verified}/${found.targets}.`);
+        } else if(stopRequested){
+          status("runStatus",`Dihentikan. ${tested} dari ${total} kandidat sudah diuji.`,"warn");log("Proses dihentikan pengguna.");
+        } else if(tested===total){
+          status("runStatus",`Belum cocok. Seluruh ${total.toLocaleString("id-ID")} kandidat selesai diuji. Tambahkan petunjuk yang lebih spesifik.`,"warn");
+          log("Selesai: tidak ada kandidat yang lolos verifikasi.");
+        }
+      } catch(err){
+        status("runStatus",`Terjadi kesalahan: ${errorText(err)}`,"bad"); log(`FATAL: ${errorText(err)}`);
+      } finally {
+        running=false; $("stopBtn").disabled=true; updateStart();
+        if(zipReader){try{await zipReader.close();}catch{} zipReader=null;}
+        // Reopen the archive so another run can be started without re-uploading.
+        if(zipFile){try{zipReader=new ZipReader(new BlobReader(zipFile));allEntries=await zipReader.getEntries();encryptedEntries=allEntries.filter(x=>!x.directory&&x.encrypted);}catch(err){status("zipStatus",`Gagal membuka ulang ZIP: ${errorText(err)}`,"bad");}}
+      }
+    });
+
+    $("stopBtn").addEventListener("click",()=>{stopRequested=true;$("stopBtn").disabled=true;status("runStatus","Permintaan berhenti diterima. Pengujian berhenti setelah kandidat yang sedang diproses selesai.","warn");});
+    $("copyBtn").addEventListener("click",async()=>{
+      const value=$("foundPassword").textContent;
+      try{await navigator.clipboard.writeText(value);$("copyBtn").textContent="Copied";}
+      catch{$("copyBtn").textContent="Copy manual";}
+    });
+  </script>
+</body>
+</html>
